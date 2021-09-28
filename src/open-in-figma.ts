@@ -21,7 +21,7 @@ export function cleanURL(maybeURL: string): string {
     return maybeURL.replace(/[,.]$/, '')
 }
 
-
+const numMatchWords = 6;
 
 // NEXT: refactor loops to use promise.all() because you have to wait for them to execute
 // Alternatively build a storage service
@@ -41,25 +41,89 @@ function getFigmaUrl(textDocumentUri: URL, editor: sourcegraph.ViewComponent): U
   // const rawStringsPattern = />([\w+\s])*</g
   // let's try this one - it'll get words on tnheir own lines
   // const rawStringsPattern = />\n[-\w+\s,.]*\n\s*</g
-  const rawStringsPattern = /=?>\s*\w[-\w+\s,.]*\s*</g
+  const rawStringsPattern = /=?>\s*\w[-\w+\s,.]*\s*<((\w>)|(\w,))?/g
+  const encodedStringsPattern = /[\s=]['"]\w+\s[A-Za-z]+\s\w+\s\w+[.,\s\w']*['"]/g
+  var searchString = '';
+  var cleanMatches = [];
   // this includes dots which we now need to strip, maybe? 
   console.log("got to 40 at " + Date.now())
   var matches = page.match(rawStringsPattern)
+  var backupMatches = page.match(encodedStringsPattern);
   console.log("got to 42 at " + Date.now())
-  console.log("matches)");
-  console.log(matches)
-  var searchString = '';
-  for (var i = 0; i < matches.length; i++) {
-    // effectively delete these things that were ...=>new Map<type> in the code 
-    matches[i].startsWith("=>") ? matches[i] = '' : matches[i]
-    matches[i] = matches[i].replace(/(<|>|\n)/gi, '').trim()
-    // filter out empty strings
-    if (matches[i] != "") {
-      searchString += " " + matches[i] 
+  if (matches) {
+    console.log("matches");
+    console.log(matches)
+    for (var i = 0; i < matches.length; i++) {
+      // effectively delete these things that were ...=>new Map<type> in the code 
+      matches[i].startsWith("=>") ? matches[i] = '' : matches[i];
+      // to catch cases likes <something>new export type<p>
+      // console.log('matches?');
+      // console.log(/<\w>$/.test(matches[i]));
+      /<\w(>|,)$/.test(matches[i]) ? matches[i] = '' : matches[i];
+      matches[i] = matches[i].replace(/(<|>|\n)/gi, '').trim()
+      // filter out empty strings
+      if (matches[i] != "") {
+        // searchString += " " + matches[i] 
+        cleanMatches.push(matches[i])
+      }
+    }
+    console.log("filtered")
+    console.log(matches)
+  }
+  // TODO decide when to use backup matches, maybe only when clean matches has nothing? 
+  // 
+  // TODO rename this to paremeterMatches or something 
+  if (backupMatches) {
+    // filter backup matches also, like title="This page title is cool" type text
+    for (var i = 0; i < backupMatches.length; i++) {
+      backupMatches[i].startsWith("=") ? 
+        backupMatches[i] = backupMatches[i].substring(1,backupMatches[i].length) : backupMatches[i];
+      // might have whitespace, then trim the quotes we know are there because regex
+      backupMatches[i] = (backupMatches[i].trim()).substring(1, backupMatches[i].length-1)
+      cleanMatches.push(backupMatches[i])
+    }
+    console.log("backupmatches filtered: ");
+    console.log(backupMatches)
+  }
+  // TODO consider making backupmatches/matches new objects after filtered sooner
+  // TODO definitely some redundant loops here 
+  var matchWords: string[] = []; 
+  if (cleanMatches) {
+    for (var i = 0; i < cleanMatches.length; i++) {
+      // add all the words
+      matchWords = matchWords.concat(cleanMatches[i].split(" "));
     }
   }
-  console.log("filtered")
-  console.log(matches)
+
+  console.log("matchWords!");
+  console.log(matchWords)
+
+  // TODO there's no way the correct code has this many loops
+  // but it's a hackathon so we'll come back to it after we prove
+  // this out 
+  if (matchWords) {
+    // lower case it 
+    for (var i = 0; i < matchWords.length; i++) {
+      matchWords[i] = matchWords[i].toLowerCase()
+    }
+    // uniqueness
+    var matchWordsSet = new Set(matchWords);
+    // sort longest to shortest
+    matchWords = [...matchWordsSet].sort((a,b) => {return b.length-a.length})
+    console.log("matchWordsclean!")
+    console.log(matchWords);
+
+    for (var i = 0; i < numMatchWords; i++) {
+      if (matchWords[i]) {
+        searchString += " " + matchWords[i] 
+      }
+    }
+  }
+
+  // make lowercase, make unique, sort 
+
+
+
   console.log(searchString);
 
   searchString = encodeURIComponent(searchString).trim()
