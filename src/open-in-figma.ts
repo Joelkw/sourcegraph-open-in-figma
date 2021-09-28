@@ -30,7 +30,31 @@ function getFigmaUrl(textDocumentUri: URL, editor: sourcegraph.ViewComponent): U
   console.log("textDocumentUri");
   console.log(textDocumentUri);
   console.log("editor!");
-  console.log(editor)
+  console.log(editor.document)
+  // I want editor.document.text
+
+  // TODO why is this throwing a type error I don't know, it works 
+  var page = editor.document.text; 
+  console.log("got to 38 at " + Date.now())
+  const rawStringsPattern = />(\w+|\s)*</g
+  console.log("got to 40 at " + Date.now())
+  var matches = page.match(rawStringsPattern)
+  console.log("got to 42 at " + Date.now())
+  console.log("matches)");
+  console.log(matches)
+  var searchString = '';
+  for (var i = 0; i < matches.length; i++) {
+    matches[i] = matches[i].replace(/(<|>|\n)/gi, '').trim()
+    if (matches[i] != "") {
+      searchString += " " + matches[i] 
+    }
+  }
+  console.log("filtered")
+  console.log(matches)
+  console.log(searchString);
+
+  searchString = encodeURIComponent(searchString).trim()
+  const figmaUrl = "https://www.figma.com/files/search?model_type=files&q=" + searchString
   // console.log("hi!!\n");
   // const hardcodedSourcegraphString = "This is a doodley text file"
   // const PERSONAL_ACCESS_TOKEN = '184998-18bab379-276b-4fbf-836c-f712fe458b31';
@@ -111,7 +135,7 @@ function getFigmaUrl(textDocumentUri: URL, editor: sourcegraph.ViewComponent): U
   
   // tryit();
   console.log("got to 109")
-  const openUrl = new URL("https://figma.com")
+  const openUrl = new URL(figmaUrl)
   console.log(openUrl)
   return openUrl 
 }
@@ -119,13 +143,14 @@ function getFigmaUrl(textDocumentUri: URL, editor: sourcegraph.ViewComponent): U
 export function activate(ctx: sourcegraph.ExtensionContext): void {
   console.log("acivated now!!!");
     if (sourcegraph.app.activeWindowChanges) {
-      const activeEditor = from(sourcegraph.app.activeWindowChanges).pipe(
-          filter((window): window is sourcegraph.Window => window !== undefined),
-          switchMap(window => window.activeViewComponentChanges),
-          filter((editor): editor is sourcegraph.CodeEditor => editor !== undefined)
-      )
-      // When the active editor changes, publish new decorations.
-      // ctx.subscriptions.add(activeEditor)
+      // TODO, I ripped this from the DD extension is it important? 
+      // const activeEditor = from(sourcegraph.app.activeWindowChanges).pipe(
+      //     filter((window): window is sourcegraph.Window => window !== undefined),
+      //     switchMap(window => window.activeViewComponentChanges),
+      //     filter((editor): editor is sourcegraph.CodeEditor => editor !== undefined)
+      // )
+      // // When the active editor changes, publish new decorations.
+      // // ctx.subscriptions.add(activeEditor)
       ctx.subscriptions.add(
         sourcegraph.commands.registerCommand('openInFigma.openFigmaLink', async (uri?: string) => {
             // if (!uri) {
