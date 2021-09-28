@@ -36,7 +36,13 @@ function getFigmaUrl(textDocumentUri: URL, editor: sourcegraph.ViewComponent): U
   // TODO why is this throwing a type error I don't know, it works 
   var page = editor.document.text; 
   console.log("got to 38 at " + Date.now())
-  const rawStringsPattern = />(\w+|\s)*</g
+  // const rawStringsPattern = />(\w+|\s|[.])*</g
+  // this one sort of works but leaves things out 
+  // const rawStringsPattern = />([\w+\s])*</g
+  // let's try this one - it'll get words on tnheir own lines
+  // const rawStringsPattern = />\n[-\w+\s,.]*\n\s*</g
+  const rawStringsPattern = /=?>\s*\w[-\w+\s,.]*\s*</g
+  // this includes dots which we now need to strip, maybe? 
   console.log("got to 40 at " + Date.now())
   var matches = page.match(rawStringsPattern)
   console.log("got to 42 at " + Date.now())
@@ -44,7 +50,10 @@ function getFigmaUrl(textDocumentUri: URL, editor: sourcegraph.ViewComponent): U
   console.log(matches)
   var searchString = '';
   for (var i = 0; i < matches.length; i++) {
+    // effectively delete these things that were ...=>new Map<type> in the code 
+    matches[i].startsWith("=>") ? matches[i] = '' : matches[i]
     matches[i] = matches[i].replace(/(<|>|\n)/gi, '').trim()
+    // filter out empty strings
     if (matches[i] != "") {
       searchString += " " + matches[i] 
     }
