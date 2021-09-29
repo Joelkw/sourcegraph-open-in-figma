@@ -4,7 +4,7 @@
   "description": "It opens the code file in figma, if a figma match is found for anything in the file",
   "publisher": "joelkw",
   "activationEvents": [
-    "onLanguage:typescript", "onLanguage:javascript", "onLanguage:css"
+    "onLanguage:typescript"
   ],
   "wip": true,
   "categories": [],
@@ -14,9 +14,6 @@
       {
         "id": "openInFigma.openFigmaLink",
         "command": "openInFigma.openFigmaLink",
-        "commandArguments": [
-          "${resource.uri}"
-        ],
         "title": "Open file in Figma",
         "actionItem": {
           "label": "Open Figma link",
@@ -29,13 +26,13 @@
       "editor/title": [
         {
           "action": "openInFigma.openFigmaLink",
-          "when": "resource"
+          "when": "(resource.language == 'typescript') && get(context, `openInFigma.anyStrings`)"
         }
       ],
       "commandPalette": [
         {
           "action": "openInFigma.openFigmaLink",
-          "when": "resource"
+          "when": "resource.language == 'typescript'"
         }
       ]
     },
