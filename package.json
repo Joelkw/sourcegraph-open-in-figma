@@ -47,6 +47,7 @@
           "maximum": 20
         }
       }
+    }
   },
   "version": "0.0.0-DEVELOPMENT",
   "license": "Apache-2.0",

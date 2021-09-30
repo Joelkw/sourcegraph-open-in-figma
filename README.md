@@ -29,15 +29,15 @@ The extension scans your typescript for "rich keywords," and then brings you to 
 
 Then these keywords are processed using artificial intelligence to determine which are most likely to produce a Figma search string that brings you the right file(s). 
 
-By "artificial intelligence," I mean that these keywords are fitlered for duplicates and then sorted by length in decreasing order, since longer words roughly appear less often and are thus more likely to help narrow down the space of possible Figma file matches. 
+By "artificial intelligence," I mean that these keywords are filtered for duplicates and then sorted by length in decreasing order, since longer words roughly appear less often and are thus more likely to help narrow down the space of possible Figma file matches. 
 
 ### Configuration
 
-Optionally, you can set a `"openInFigma.numMatchWords":` integer in your user settings to determine how many keywords to run a Figma search over, maximum. The default is 6. You may want to adjust it up if you have large text-heavy files or a large number of Figma files. You may want to adjust it down if you are getting "overfit" Figma searches returning no Figma files. Or you can adjust it for no reason other than you don't trust me. 
+Optionally, you can set a `"openInFigma.numMatchWords":` integer in your user settings to determine how many keywords to run a Figma search over, maximum. The default is 6. You may want to adjust it up if you have large text-heavy files or a large number of Figma files. You may want to adjust it down if you are getting "overfit" Figma searches returning no Figma files. You may want to adjust it for no reason other than you don't trust me. 
 
 The minimum is 3 keywords found in a file in order to activate the extension. This is not yet configurable. Maybe it never will be. 
 
-You are welcome to fork this extension (or make a PR) if you want to propose a better sorting/filtering. 
+You are welcome to fork this extension or make a PR if you want to propose better sorting/filtering. 
 
 ## For in-file Figma Links
 
