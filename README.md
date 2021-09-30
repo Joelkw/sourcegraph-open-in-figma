@@ -4,6 +4,8 @@
 
 This extension takes you from reading code to "viewing what that code file looks like" via Figma files. 
 
+![demo](https://storage.googleapis.com/sourcegraph-assets/extensions/open-in-figma-demo.gif)
+
 It helps you: 
 
 - Answer quick questions about "how does this look?" or "where in the app is this?" – without needing to find the same page deployed somewhere
