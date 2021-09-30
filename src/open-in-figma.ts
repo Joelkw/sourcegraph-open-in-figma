@@ -3,26 +3,21 @@ import * as sourcegraph from 'sourcegraph'
 // import { filter, switchMap } from 'rxjs/operators'
 // import * as stringSimilarity from 'string-similarity'
 
-export function checkIsURL(maybeURL: string): boolean {
-    try {
-        const url = new URL(maybeURL)
-        return url.protocol === 'http:' || url.protocol === 'https:'
-    } catch {
-        return false
-    }
+interface Settings {
+  ['openInFigma.numMatchWords']: number
 }
 
-const numMatchWords = 6;
+// default to 6 here 
+const numMatchWords = sourcegraph.configuration.get<Settings>().get('openInFigma.numMatchWords') ||  6;
 const numMinMatches = 3;
 
 function getMeaningfulStrings(editor: sourcegraph.CodeEditor): string[] {
 
-  // TODO why is this throwing a type error I don't know, it works 
-  if (editor.document.uri && /test\./.test(editor.document.uri)) {
-    // then it's a test file so return empty 
-    console.log("test file!");
-    return [];
-  }
+  // if (editor.document.uri && /test\./.test(editor.document.uri)) {
+  //   // then it's a test file so return empty 
+  //   console.log("this was a test file!");
+  //   return [];
+  // }
 
   var page = editor.document.text; 
   // const rawStringsPattern = />(\w+|\s|[.])*</g
